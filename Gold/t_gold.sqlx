@@ -1,0 +1,32 @@
+config {
+    type: "table",
+    schema: "finops_gold",
+    name: "Gold_Table_AWS_AZ_GCP",
+    tags: ["gold","aws","azure","gcp"],
+    uniqueKey: ["BillingAccountID","ChargePeriodStart","InvoiceID", "ChargeType", "SKUID"],
+    bigquery: {
+        partitionBy: "DATE(ChargePeriodStart)"
+    },
+    description: "Union of silver tables to form gold table"
+}
+
+select IngestionDate, Cloud, Zone, BillingAccountID, BillingCurrency, BillingPeriodEnd
+, BillingPeriodStart, MarketplaceCharge, ChargeCategory, ChargeDescription, ChargePeriodEnd
+, ChargePeriodStart, ChargeType, DiscountID, null GcpCostWithoutCredits, null GcpCredits, BilledCost, EffectiveCost, ListCost, InvoiceID
+, UsageAmount, UsageUnit, PricingUnit, Region, ResourceID, ServiceCategory, ServiceSubCategory
+, SKUID, Account, AccountName, Tags AwsTags, null GcpTags, null GcpLabels, null AzureAdditionalInformation, null AzureResourceGroup
+from ${ref("t_silver_aws")}
+union all
+select IngestionDate, Cloud, Zone, BillingAccountID, BillingCurrency, BillingPeriodEnd
+, BillingPeriodStart, MarketplaceCharge, ChargeCategory, ChargeDescription, ChargePeriodEnd
+, ChargePeriodStart, ChargeType, DiscountID,null, null, BilledCost, EffectiveCost, ListCost, null
+, UsageAmount, UsageUnit, PricingUnit, Region, ResourceID, ServiceCategory, ServiceSubCategory
+, SKUID, Account, AccountName, null, null, null, AdditionalInformation, ResourceGroup
+from ${ref("t_silver_azure")}
+union all
+select IngestionDate, Cloud, Zone, BillingAccountID, BillingCurrency, null
+, null, null, null, ChargeDescription, ChargePeriodEnd
+, ChargePeriodStart, ChargeType, null,GcpCostWithoutCredits, GcpCredits, null, EffectiveCost, ListCost, InvoiceID
+, UsageAmount, UsageUnit, PricingUnit, Region, ResourceID, ServiceCategory, ServiceSubCategory
+, SKUID, Account, AccountName, null, Tags, Labels, null, null
+from ${ref("t_silver_gcp")}

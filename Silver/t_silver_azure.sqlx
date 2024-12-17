@@ -1,0 +1,16 @@
+config {
+    type: "incremental",
+    schema: "finops_silver",
+    name: "t_silver_azure",
+    tags: ["silver", "azure"],
+    uniqueKey: ["BillingAccountID","ChargePeriodStart", "ChargeType", "SKUID","Account"],
+    bigquery: {
+        partitionBy: "date(ChargePeriodStart)",
+        updatePartitionFilter: `ChargePeriodStart >= timestamp_sub(current_timestamp(), interval 62 day)`
+    },
+    description: "silver data for vmware azure"
+}
+
+select * from
+${ref("t_bronze_azure")} 
+${when(incremental(), `WHERE ChargePeriodStart >= timestamp_sub(current_timestamp(), interval 62 day)`)}

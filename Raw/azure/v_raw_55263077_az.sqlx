@@ -1,0 +1,47 @@
+config {
+    type: "view",
+    schema: "finops_raw",
+    name: "v_raw_55263077_azure",
+    description: "Columns-subselected version of payer 55263077 dataset"
+}
+
+select
+current_date as IngestionDate, -- ingestion metadata
+"Azure"	AS Cloud, -- ingestion metadata
+ResourceLocation	AS Zone,
+SAFE_CAST(BillingAccountId AS STRING)	AS BillingAccountID,
+BillingCurrencyCode	AS BillingCurrency,
+BillingPeriodEndDate	AS BillingPeriodEnd,
+BillingPeriodStartDate	AS BillingPeriodStart,
+case UPPER(PublisherType)
+  when "MARKETPLACE" THEN TRUE
+  else FALSE
+END	AS MarketplaceCharge,
+metercategory	AS ChargeCategory,
+ProductName	AS ChargeDescription,
+safe_cast(Date as timestamp)	AS ChargePeriodEnd,
+safe_cast(Date as timestamp)	AS ChargePeriodStart,
+pricingmodel	AS ChargeType,
+benefitName	AS DiscountID,
+CostInBillingCurrency	AS BilledCost,
+case
+when EffectivePrice != UnitPrice then (EffectivePrice * Quantity)	
+else ( UnitPrice * Quantity )
+end AS EffectiveCost,
+(UnitPrice * Quantity)	AS ListCost,
+-- ""	AS InvoiceID,
+Quantity	AS UsageAmount,
+UnitOfMeasure	AS UsageUnit,
+UnitOfMeasure	AS PricingUnit,
+ResourceLocation	AS Region,
+ResourceId	AS ResourceID,
+ConsumedService	AS ServiceCategory,
+ProductName	AS ServiceSubCategory,
+MeterId	AS SKUID,
+SubscriptionId	AS Account,
+SubscriptionName	AS AccountName,
+-- parse_json("{}")	AS Tags,
+-- ""	AS Labels,
+AdditionalInfo	AS AdditionalInformation,
+ResourceGroup AS ResourceGroup
+from ${ref("landing_payer_55263077")}

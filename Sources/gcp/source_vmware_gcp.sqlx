@@ -1,0 +1,7 @@
+config {
+    type: "declaration",
+    database: "secopsglp01-finops",
+    schema: "landing_gcp",
+    name: "landing_01AA3C_7FB3F1_640577",
+    description: "Raw data for 01AA3C_7FB3F1_640577"
+}

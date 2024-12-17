@@ -1,0 +1,7 @@
+config {
+    type: "declaration",
+    database: "secopsglp01-finops",
+    schema: "landing_azure",
+    name: "landing_payer_55263077",
+    description: "Raw data for Azure Payer 55263077"
+}

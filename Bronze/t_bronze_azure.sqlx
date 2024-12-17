@@ -1,0 +1,22 @@
+-- Brings in ALL the bronze data for all payers on AZURE
+config {
+    type: "incremental",
+    schema: "finops_bronze",
+    name: "t_bronze_azure",
+    tags: ["bronze", "azure"],
+    uniqueKey: ["BillingAccountID","ChargePeriodStart", "ChargeType", "SKUID","Account"],
+    bigquery: {
+        partitionBy: "date(ChargePeriodStart)",
+        updatePartitionFilter: `ChargePeriodStart >= timestamp_sub(current_timestamp(), interval 62 day)`
+    },
+    description: "bronze data for azure"
+}
+
+-- select * from
+-- ${ref("v_raw_vmware_azure")} union all
+select * from
+${ref("v_raw_55263077_azure")} union all
+select * from
+${ref("v_raw_8309416_azure")} union all
+select * from
+${ref("v_raw_broadcom_mca_azure")}
